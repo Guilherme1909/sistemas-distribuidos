@@ -19,6 +19,8 @@ print(config("SECRET_KEY"))
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # BASE_DIR = Path(__file__).resolve().parent.parent
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+APPS_DIR = os.path.join(BASE_DIR, 'apps') 
+sys.path.insert(0, APPS_DIR) 
 
 
 # Quick-start development settings - unsuitable for production
@@ -30,7 +32,7 @@ SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = True
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = []
 
@@ -44,6 +46,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
+    "categories.apps.CategoriesConfig",
 ]
 
 MIDDLEWARE = [
