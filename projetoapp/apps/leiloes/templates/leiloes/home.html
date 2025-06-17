@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Leilões{% endblock %}
+
+{% block content %}
+<h2 class="text-2xl font-semibold mb-4">Itens em Leilão</h2>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    {% for item in itens %}
+    <div class="bg-white rounded-lg shadow-md p-4">
+        {% if item.imagem %}
+            <img src="{{ item.imagem.url }}" alt="{{ item.titulo }}" class="h-40 w-full object-cover mb-2 rounded">
+        {% else %}
+            <div class="h-40 w-full bg-gray-300 flex items-center justify-center mb-2 rounded">
+                <span class="text-gray-500">Sem imagem</span>
+            </div>
+        {% endif %}
+        <h3 class="text-lg font-bold">{{ item.titulo }}</h3>
+        <p class="text-sm text-gray-600">Início: {{ item.data_inicio|date:"d/m/Y H:i" }}</p>
+        <p class="text-sm text-gray-800 font-semibold">Valor Atual: R$ {{ item.valorAtual }}</p>
+    </div>
+    {% empty %}
+    <p>Sem itens no momento.</p>
+    {% endfor %}
+</div>
+{% endblock %}

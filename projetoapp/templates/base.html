@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'dist/styles.css' %}">
+    <title>{% block title %}Leilões App{% endblock %}</title>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Topo -->
+    <header class="bg-blue-600 text-white py-4 text-center text-3xl font-bold">
+        Leilões App
+    </header>
+
+    <!-- Menu -->
+    <nav class="bg-blue-500 text-white flex justify-center space-x-8 py-2">
+        <a href="{% url 'leiloes:home' %}" class="hover:underline">HOME</a>
+        <a href="#" class="hover:underline">COMPRA</a>
+        <a href="#" class="hover:underline">VENDA</a>
+        <a href="#" class="hover:underline">DESTAQUES</a>
+    </nav>
+
+    <!-- Conteúdo -->
+    <main class="p-6">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+</body>
+</html>
