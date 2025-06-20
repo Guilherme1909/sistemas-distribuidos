@@ -7,7 +7,13 @@
 
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 {% for item in itens %}
-<div class="bg-white rounded-lg shadow-md p-4">
+<div class="bg-white rounded-lg shadow-md p-4 relative">
+
+    {% if item.valorFinal and item.valorAtual and item.valorAtual >= item.valorFinal %}
+        <!-- Tag VENDIDO -->
+        <div class="absolute top-2 right-2 bg-red-600 text-black text-xs font-bold px-2 py-1 rounded shadow">VENDIDO</div>
+    {% endif %}
+
     {% if item.imagem %}
         <img src="{{ item.imagem.url }}" alt="{{ item.titulo }}" class="h-40 w-full object-cover mb-2 rounded">
     {% else %}
@@ -15,12 +21,19 @@
             <span class="text-gray-500">Sem imagem</span>
         </div>
     {% endif %}
-    
-    <h3 class="text-lg font-bold">
-        <a href="{% url 'leiloes:item_detail' item.id %}" class="text-blue-500 hover:underline">
+
+    {% if item.valorFinal and item.valorAtual and item.valorAtual >= item.valorFinal %}
+        <h3 class="text-lg font-bold text-gray-500 line-through">
             {{ item.titulo }}
-        </a>
-    </h3>
+        </h3>
+        <p class="text-sm text-red-500 font-semibold">Leilão encerrado (VENDIDO)</p>
+    {% else %}
+        <h3 class="text-lg font-bold">
+            <a href="{% url 'leiloes:item_detail' item.id %}" class="text-blue-500 hover:underline">
+                {{ item.titulo }}
+            </a>
+        </h3>
+    {% endif %}
 
     <p class="text-sm text-gray-600">Início: {{ item.data_inicio|date:"d/m/Y H:i" }}</p>
     <p class="text-sm text-gray-800 font-semibold">Valor Atual: R$ {{ item.valorAtual }}</p>
