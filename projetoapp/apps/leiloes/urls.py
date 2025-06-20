@@ -10,6 +10,6 @@ router.register(r'Lances', views.LanceViewSet, basename='lances')
 
 urlpatterns = [
     path('', views.home, name='home'),
-    #path('item/<int:item_id>/', views.item_detail, name='item_detail'),
+    path('item/<int:item_id>/', views.item_detail, name='item_detail'),
     path('api/', include(router.urls)),
 ]
