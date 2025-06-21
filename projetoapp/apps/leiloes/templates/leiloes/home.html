@@ -36,7 +36,7 @@
     {% endif %}
 
     <p class="text-sm text-gray-600">Início: {{ item.data_inicio|date:"d/m/Y H:i" }}</p>
-    <p class="text-sm text-gray-800 font-semibold">Valor Atual: R$ {{ item.valorAtual }}</p>
+    <p class="text-sm text-gray-800 font-semibold">Valor Atual: R$ {{ item.valorAtual|default:item.valorInicial }}</p>
 </div>
 {% endfor %}
 </div>

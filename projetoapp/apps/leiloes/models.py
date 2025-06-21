@@ -9,7 +9,7 @@ class Item(models.Model):
     data_fim = models.DateTimeField('Data Final', null=True)
     valorInicial = models.DecimalField('Valor Inicial', max_digits=10, decimal_places=2, null=True)
     valorAtual = models.DecimalField('Valor Atual', max_digits=10, decimal_places=2, null=True)
-    valorFinal = models.DecimalField('Valor Final', max_digits=10, decimal_places=2, null=True)
+    valorFinal = models.DecimalField('Valor Final', max_digits=10, decimal_places=2)
     imagem = models.ImageField(upload_to='itens/', null=True, blank=True)
 
     class Meta:

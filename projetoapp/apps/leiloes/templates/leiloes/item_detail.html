@@ -3,7 +3,7 @@
 {% block title %}{{ item.titulo }} - Detalhes{% endblock %}
 
 {% block content %}
-<div class="bg-white rounded-lg shadow-md p-4 max-w-md mx-auto mt-6">
+<div class="bg-white rounded-lg shadow-md p-4 mx-auto mt-6" style="width: 500px;">
     <!-- Imagem -->
     {% if item.imagem %}
         <img src="{{ item.imagem.url }}" alt="{{ item.titulo }}" class="h-40 w-full object-cover mb-4 rounded">
@@ -18,21 +18,39 @@
     <p class="text-gray-700 my-2">{{ item.descricao }}</p>
     <p class="text-sm text-gray-600">Início: {{ item.data_inicio|date:"d/m/Y H:i" }}</p>
     <p id="valor-atual" class="text-lg text-green-600 font-semibold my-2">
-        Valor Atual: R$ {{ item.valorAtual }}
+        Valor Atual: R$ {{ item.valorAtual|default:item.valorInicial }}
     </p>
 
-    <!-- Formulário de lance -->
-    <form id="lance-form" class="mt-4">
-        {% csrf_token %}
-        <input type="number" id="valor" step="0.01" placeholder="Digite seu lance"
-            class="w-full border p-2 rounded mb-2" required>
-        <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
-            Enviar Lance
-        </button>
-    </form>
+    {% if item.valorAtual >= item.valorFinal %}
+        <!-- Badge vermelho de VENDIDO -->
+        <div class="bg-red-500 text-white text-center py-1 rounded mb-2">
+            VENDIDO
+        </div>
 
-    <!-- Mensagem -->
-    <div id="mensagem" class="mt-3 text-sm text-center hidden"></div>
+        <!-- Formulário desativado -->
+        <form id="lance-form" class="mt-4 pointer-events-none opacity-50">
+            {% csrf_token %}
+            <input type="number" id="valor" step="1" placeholder="Digite seu lance"
+                class="w-full border p-2 rounded mb-2 bg-gray-200 cursor-not-allowed" disabled>
+            <button type="submit" disabled
+                class="w-full bg-gray-400 text-white py-2 px-4 rounded cursor-not-allowed">
+                Enviar Lance
+            </button>
+        </form>
+    {% else %}
+        <!-- Formulário ativo -->
+        <form id="lance-form" class="mt-4">
+            {% csrf_token %}
+            <input type="number" id="valor" step="1" placeholder="Digite seu lance"
+                class="w-full border p-2 rounded mb-2" required>
+            <button type="submit"
+                class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+                Enviar Lance
+            </button>
+        </form>
+        <!-- Mensagem -->
+        <div id="mensagem" class="mt-3 text-sm text-center hidden"></div>
+    {% endif %}
 </div>
 
 <!-- Script -->
@@ -40,36 +58,59 @@
 document.getElementById('lance-form').addEventListener('submit', async function(e) {
     e.preventDefault();
 
-    const valor = document.getElementById('valor').value;
+    var valor = parseFloat(document.getElementById('valor').value);
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-    const resposta = await fetch('/leiloes/api/Lances/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken
-        },
-        body: JSON.stringify({
-            item: "{{ item.id }}",
-            valor: valor
-        })
-    });
+    var valorF = "{{ item.valorFinal }}";
+    var valorFinal = parseFloat(valorF);
+    var valorA = "{{ item.valorAtual|default:item.valorInicial }}";
+    var valorAgora = parseFloat(valorA);
 
-    const mensagem = document.getElementById('mensagem');
-    const valorAtual = document.getElementById('valor-atual');
+    if (valor >= valorFinal) {
+        valor = valorFinal;
+    }
 
-    if (resposta.ok) {
-        const dados = await resposta.json();
-        mensagem.textContent = 'Lance enviado com sucesso!';
-        mensagem.className = 'text-green-600 text-sm mt-3';
-        valorAtual.textContent = 'Valor Atual: R$ ' + parseFloat(dados.valor).toFixed(2);
-        document.getElementById('valor').value = '';
+    if (valor > valorAgora) {
+        const resposta = await fetch('/api/Lances/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                item: "{{ item.id }}",
+                valor: valor
+            })
+        });
+
+        const mensagem = document.getElementById('mensagem');
+        const valorAtual = document.getElementById('valor-atual');
+
+        if (resposta.ok) {
+            const dados = await resposta.json();
+            mensagem.textContent = 'Lance enviado com sucesso!';
+            mensagem.className = 'text-green-600 text-sm mt-3';
+            valorAtual.textContent = 'Valor Atual: R$ ' + parseFloat(dados.valor).toFixed(2);
+            document.getElementById('valor').value = '';
+
+            if (dados.valor == valorFinal) {
+                setTimeout(function() {
+                    location.reload();
+                }, 500);
+            }
+        } else {
+            console.log('Erro ao enviar lance:', resposta.status, resposta.statusText);
+            mensagem.textContent = 'Erro ao enviar o lance.';
+            mensagem.className = 'text-red-600 text-sm mt-3';
+        }
+
+        mensagem.classList.remove('hidden');
     } else {
         mensagem.textContent = 'Erro ao enviar o lance.';
         mensagem.className = 'text-red-600 text-sm mt-3';
-    }
 
-    mensagem.classList.remove('hidden');
+        mensagem.classList.remove('hidden');
+    }
 });
 </script>
 {% endblock %}
